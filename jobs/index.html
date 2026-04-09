@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Israeli Jobs Directory 🇮🇱</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --header-bg: #0f172a;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --tab-active: #3b82f6;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-hover: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--header-bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #fff;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .logo-title span.flag { font-size: 1.6rem; line-height: 1; }
+    .logo-title h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.5);
+      pointer-events: none;
+    }
+    #search {
+      width: 100%;
+      padding: 0.5rem 1rem 0.5rem 2.25rem;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 0.875rem;
+      outline: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    #search::placeholder { color: rgba(255,255,255,0.5); }
+    #search:focus {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .toggle-wrap label {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.75);
+      cursor: pointer;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 38px;
+      height: 21px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.2);
+      border-radius: 999px;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 15px; height: 15px;
+      left: 3px; top: 3px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(17px); }
+
+    /* ── Tabs ── */
+    .tabs-bar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 57px;
+      z-index: 90;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs-bar::-webkit-scrollbar { display: none; }
+
+    .tabs-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      padding: 0 1rem;
+    }
+
+    .tab-btn {
+      padding: 0.8rem 1.1rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .tab-btn:hover { color: var(--text); background: #f8fafc; }
+    .tab-btn.active { color: var(--tab-active); border-bottom-color: var(--tab-active); font-weight: 600; }
+    .tab-btn .count {
+      background: #e2e8f0;
+      color: #475569;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+    }
+    .tab-btn.active .count { background: #dbeafe; color: var(--accent); }
+
+    /* ── Main ── */
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* ── Setup banner ── */
+    #setup-banner {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      color: #1e40af;
+      display: none;
+    }
+    #setup-banner strong { display: block; margin-bottom: 0.35rem; font-size: 0.9rem; }
+    #setup-banner ol { padding-left: 1.25rem; line-height: 1.9; }
+    #setup-banner code {
+      background: #bfdbfe;
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      font-family: monospace;
+    }
+    #setup-banner .close-btn {
+      float: right;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: #93c5fd;
+      line-height: 1;
+      margin-left: 0.5rem;
+    }
+
+    /* ── Results bar ── */
+    .results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .results-count {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .search-mode-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      display: none;
+    }
+
+    /* ── Grid & Cards ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      display: block;
+      position: relative;
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+      aspect-ratio: 4 / 3;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+    .card.featured {
+      border-color: var(--accent);
+    }
+
+    .card-logo-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+    }
+    .card-logo-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .card-initial {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .card-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent 0%, rgba(0,0,0,0.72) 100%);
+      padding: 1.5rem 0.6rem 0.55rem;
+    }
+    .card-name {
+      display: block;
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.3;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+    .card-cat-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.63rem;
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+      margin-bottom: 0.2rem;
+      font-weight: 500;
+    }
+
+    .featured-star {
+      position: absolute;
+      top: 0.4rem;
+      right: 0.45rem;
+      font-size: 0.85rem;
+      line-height: 1;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+    }
+
+    /* ── Empty / Loading states ── */
+    .state-msg {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .state-msg .icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+
+    .skeleton {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 12px;
+      aspect-ratio: 4 / 3;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.78rem;
+      color: #94a3b8;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .header-inner { padding: 0.75rem 1rem; gap: 0.75rem; }
+      .logo-title h1 { font-size: 1rem; }
+      main { padding: 1rem; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+    }
+    @media (max-width: 440px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-title">
+      <span class="flag">🇮🇱</span>
+      <h1>Israeli Jobs Directory</h1>
+    </div>
+    <div class="controls">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9 3a6 6 0 100 12A6 6 0 009 3zM1 9a8 8 0 1114.32 4.906l3.387 3.387a1 1 0 01-1.414 1.414l-3.387-3.387A8 8 0 011 9z" clip-rule="evenodd"/>
+        </svg>
+        <input type="search" id="search" placeholder="Search companies…" autocomplete="off" />
+      </div>
+      <div class="toggle-wrap">
+        <label class="toggle-switch" title="Featured first">
+          <input type="checkbox" id="featuredToggle" />
+          <span class="toggle-slider"></span>
+        </label>
+        <label for="featuredToggle">⭐ Featured</label>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <div class="tabs-inner" id="tabs"></div>
+</div>
+
+<main>
+  <div id="setup-banner">
+    <button class="close-btn" onclick="this.parentElement.style.display='none'" title="Dismiss">✕</button>
+    <strong>💡 Connect your Google Sheet to edit data live</strong>
+    <ol>
+      <li>Open <a href="https://sheets.google.com" target="_blank">sheets.google.com</a> → create a new sheet</li>
+      <li>File → Import → Upload <code>companies.csv</code></li>
+      <li>File → Share → <strong>Publish to web</strong> → Sheet1 → <em>Comma-separated values</em> → Publish</li>
+      <li>Copy the URL, then open this page as:<br/>
+          <code>index.html?sheet=YOUR_PUBLISHED_CSV_URL</code></li>
+    </ol>
+  </div>
+
+  <div class="results-bar">
+    <span class="results-count" id="resultsCount"></span>
+    <span class="search-mode-label" id="searchModeLabel">Search results across all categories</span>
+  </div>
+  <div class="grid" id="grid">
+    <!-- skeleton placeholders while loading -->
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+</main>
+
+<footer>
+  Israeli Jobs Directory &nbsp;·&nbsp;
+  Data sourced from public company information &nbsp;·&nbsp;
+  <a href="?">Refresh</a>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────
+// CONFIG
+// Set SHEET_URL to your Google Sheets published CSV URL, or pass ?sheet=URL
+// ─────────────────────────────────────────────
+const SHEET_URL = '';
+
+// ── State ──
+let allData = [];
+let activeCategory = '';
+let searchQuery = '';
+let featuredFirst = false;
+let isSearchMode = false;
+
+// ── Palette for logo fallbacks (initial tile) ──
+const PALETTE = [
+  '#3b82f6','#8b5cf6','#ec4899','#f59e0b','#10b981',
+  '#ef4444','#06b6d4','#f97316','#6366f1','#84cc16'
+];
+function getColor(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+  return PALETTE[Math.abs(h) % PALETTE.length];
+}
+
+// ── CSV Parser (handles quoted fields) ──
+function parseCSV(text) {
+  const lines = text.replace(/\r/g, '').trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = parseCSVLine(lines[0]);
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const vals = parseCSVLine(lines[i]);
+    const row = {};
+    headers.forEach((h, idx) => { row[h.trim()] = (vals[idx] || '').trim(); });
+    if (row['Company Name']) rows.push(row);
+  }
+  return rows;
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') {
+      if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
+      else inQ = !inQ;
+    } else if (c === ',' && !inQ) {
+      result.push(cur); cur = '';
+    } else {
+      cur += c;
+    }
+  }
+  result.push(cur);
+  return result;
+}
+
+// ── Data loading ──
+async function loadData() {
+  const params = new URLSearchParams(location.search);
+  const sheetParam = params.get('sheet');
+  const url = sheetParam || SHEET_URL || './companies.csv';
+  const isLocal = !sheetParam && !SHEET_URL;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  const data = parseCSV(text);
+
+  if (isLocal) {
+    document.getElementById('setup-banner').style.display = 'block';
+  }
+  return data;
+}
+
+// ── Categories ──
+function getCategories() {
+  const seen = new Set();
+  const cats = [];
+  allData.forEach(d => {
+    if (d.Category && !seen.has(d.Category)) {
+      seen.add(d.Category);
+      cats.push(d.Category);
+    }
+  });
+  return cats;
+}
+
+function getCategoryCount(cat, data) {
+  return data.filter(d => d.Category === cat).length;
+}
+
+// ── Filtered data ──
+function getDisplayData() {
+  let filtered;
+  if (searchQuery) {
+    isSearchMode = true;
+    const q = searchQuery.toLowerCase();
+    filtered = allData.filter(d =>
+      d['Company Name'].toLowerCase().includes(q) ||
+      (d.Category || '').toLowerCase().includes(q)
+    );
+  } else {
+    isSearchMode = false;
+    filtered = allData.filter(d => d.Category === activeCategory);
+  }
+
+  if (featuredFirst) {
+    filtered = [...filtered].sort((a, b) =>
+      (b.Featured === 'Yes' ? 1 : 0) - (a.Featured === 'Yes' ? 1 : 0)
+    );
+  }
+  return filtered;
+}
+
+// ── Render tabs ──
+function renderTabs() {
+  const cats = getCategories();
+  const el = document.getElementById('tabs');
+  const displayData = isSearchMode ? [] : getDisplayData();
+
+  el.innerHTML = '';
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (cat === activeCategory && !isSearchMode ? ' active' : '');
+    const count = allData.filter(d => d.Category === cat).length;
+    btn.innerHTML = `${cat} <span class="count">${count}</span>`;
+    btn.onclick = () => {
+      activeCategory = cat;
+      searchQuery = '';
+      document.getElementById('search').value = '';
+      isSearchMode = false;
+      render();
+    };
+    el.appendChild(btn);
+  });
+}
+
+// ── Render grid ──
+function renderGrid(companies) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  if (companies.length === 0) {
+    const msg = document.createElement('div');
+    msg.className = 'state-msg';
+    msg.innerHTML = searchQuery
+      ? `<span class="icon">🔍</span>No companies match "<strong>${escapeHtml(searchQuery)}</strong>"`
+      : `<span class="icon">📭</span>No companies in this category yet`;
+    grid.appendChild(msg);
+    return;
+  }
+
+  companies.forEach(company => {
+    const card = document.createElement('a');
+    card.className = 'card' + (company.Featured === 'Yes' ? ' featured' : '');
+    const careersUrl = company['Careers URL'] || company['Website URL'] || '#';
+    card.href = careersUrl;
+    card.target = '_blank';
+    card.rel = 'noopener noreferrer';
+    card.title = `${company['Company Name']} — Open careers page`;
+
+    // Logo wrapper
+    const logoWrap = document.createElement('div');
+    logoWrap.className = 'card-logo-wrap';
+
+    const logoUrl = company['Logo URL'];
+    if (logoUrl) {
+      const img = document.createElement('img');
+      img.src = logoUrl;
+      img.alt = company['Company Name'] + ' logo';
+      img.loading = 'lazy';
+      img.onerror = function () {
+        this.style.display = 'none';
+        const tile = document.createElement('div');
+        tile.className = 'card-initial';
+        tile.style.background = getColor(company['Company Name']);
+        tile.textContent = company['Company Name'].charAt(0).toUpperCase();
+        this.parentElement.appendChild(tile);
+      };
+      logoWrap.appendChild(img);
+    } else {
+      const tile = document.createElement('div');
+      tile.className = 'card-initial';
+      tile.style.background = getColor(company['Company Name']);
+      tile.textContent = company['Company Name'].charAt(0).toUpperCase();
+      logoWrap.appendChild(tile);
+    }
+
+    // Overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'card-overlay';
+
+    if (isSearchMode && company.Category) {
+      const badge = document.createElement('span');
+      badge.className = 'card-cat-badge';
+      badge.textContent = company.Category;
+      overlay.appendChild(badge);
+    }
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'card-name';
+    nameEl.textContent = company['Company Name'];
+    overlay.appendChild(nameEl);
+
+    // Featured star
+    if (company.Featured === 'Yes') {
+      const star = document.createElement('span');
+      star.className = 'featured-star';
+      star.textContent = '⭐';
+      card.appendChild(star);
+    }
+
+    card.appendChild(logoWrap);
+    card.appendChild(overlay);
+    grid.appendChild(card);
+  });
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Results bar ──
+function renderResultsBar(companies) {
+  const countEl = document.getElementById('resultsCount');
+  const labelEl = document.getElementById('searchModeLabel');
+  countEl.textContent = `${companies.length} ${companies.length === 1 ? 'company' : 'companies'}`;
+  labelEl.style.display = isSearchMode ? 'inline' : 'none';
+}
+
+// ── Full render ──
+function render() {
+  const companies = getDisplayData();
+  renderTabs();
+  renderResultsBar(companies);
+  renderGrid(companies);
+}
+
+// ── Init ──
+loadData()
+  .then(rows => {
+    allData = rows;
+    const cats = getCategories();
+    activeCategory = cats[0] || '';
+    render();
+  })
+  .catch(err => {
+    console.error('Failed to load data:', err);
+    const grid = document.getElementById('grid');
+    grid.innerHTML = `
+      <div class="state-msg">
+        <span class="icon">⚠️</span>
+        <strong>Could not load company data.</strong><br/>
+        Make sure <code>companies.csv</code> is in the same folder as this file,<br/>
+        or pass <code>?sheet=YOUR_GOOGLE_SHEETS_CSV_URL</code> in the URL.
+      </div>`;
+    document.getElementById('setup-banner').style.display = 'block';
+  });
+
+// ── Search ──
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  render();
+});
+
+// ── Featured toggle ──
+document.getElementById('featuredToggle').addEventListener('change', e => {
+  featuredFirst = e.target.checked;
+  render();
+});
+</script>
+</body>
+</html>
